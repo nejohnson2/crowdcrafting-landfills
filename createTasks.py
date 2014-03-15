@@ -127,7 +127,7 @@ if __name__ == "__main__":
     if not options.coordinates:
         parser.error("You must supply a file name with the coordinates")
     if not options.n_answers:
-        options.n_answers = 30
+        options.n_answers = 10
 
     if (options.verbose):
         print('Running against PyBosssa instance at: %s' % options.api_url)

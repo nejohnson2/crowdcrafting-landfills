@@ -2,19 +2,22 @@
     <div class="span12">
         <div id="modal" class="modal hide fade">
             <div class="modal-header">
-                <h3>MapKnitter tutorial</h3>
+                <h3>Landfill tutorial</h3>
             </div>
             <div id="0" class="modal-body" style="display:none">
-                <p><strong>Hi!</strong> This is a <strong>demo application</strong> that shows how you can analyze MapKnitter maps using the PyBossa framework in Crowdcrafting.org.
+                <p><strong>Hi!</strong> This is a <strong>research application</strong> that helps gather more information about landfills across the United States.  Currently, there are <strong>1235</strong> landfill across the country. Through this application, we want to identify the total square footage of all landfills in the country as well as gather more information about the areas surrounding landfills.  
                </p> 
+               <p>This is a research project being conducted through <strong>Open Trash Lab</strong>, an organization that strives to improve our waste practices across the country by better understanding the current waste system.  Identifying landfills and understanding them better is a step towards connecting people with their waste and understanding the life of their trash.</p>
             </div>
             <div id="1" class="modal-body" style="display:none">
-                <p>The application is really simple. It loads a map from the MapKnitter repository, centers the map and the goal is to browse the map and mark with points all the visible tents.</p>
-                <p>The web map provides different layers so you can change between them in order to get some help from satellite images.
-                </p>
-                <p>When you find a tent, click in the Point button and place it in the middle of the park. Then click submit and you will have completed one task.</p>
+                <p>To begin, you will be presented the latitude and longitude of a landfill collected from the Environmental Protection Agency.</p>
+                <p><strong>This data may contain errors!!!</strong></p>
+                <p>Often the latitude and longitude of a landfill may relate to an office or nearby building and not the landfill itself.</p>
                 <p>As this is a demo application, you can also draw polygons. Polygons could be used to measure areas in the maps.</p>
             </div>
+            <div id="2" class="modal-body" style="display:none">
+                <p>Test on modal three</p>
+            </div>            
             <div class="modal-footer">
                 <a id="prevBtn" href="#" onclick="showStep('prev')" class="btn">Previous</a>
                 <a id="nextBtn" href="#" onclick="showStep('next')" class="btn btn-success">Next</a>
@@ -39,8 +42,7 @@
         else {
             $("#prevBtn").show();
         }
-
-        if (step == 1 ) {
+        if (step == 2 ) {
             $("#nextBtn").hide();
             $("#startContrib").show();
         }
