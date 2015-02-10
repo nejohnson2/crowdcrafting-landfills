@@ -31,25 +31,6 @@
     .layersDiv label {
         color: white;
     }
-    /* css for experimental tools */
-   #controls {
-	    width: 512px;
-	}
-	#controlToggle {
-	    padding-left: 1em;
-	}
-	#controlToggle li {
-	    list-style: none;
-	}
-	#answer {
-		width: 980px;
-	}
-	#answerbtn {
-		float: right;
-	}
-	.btn-certain {
-		float: right;
-	}
 </style>
 
 <div id="loading" style="display:none">
@@ -97,12 +78,8 @@
 	You are working on task: <span id="task-id" class="label label-warning"></span>
 </div>
 <div id="maps" class="row">
-
+    <!--<div style="font-size:10px;">Marker Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a></div>-->
     <div id="answer" class="skeleton span10">
-	    <button id="answerbtn" class="btn btn-success btn-submit" value="coordinates" style="display:none"><i class="icon-check icon-white"></i> Save this data</button>
-        <button id="very" class="btn btn-inverse btn-certain" value="1">Very Certain</button>
-        <button id="not" class="btn btn-inverse btn-certain" value="0">Not Certain</button>
-
       <div id="controls" class="btn-group" data-toggle="buttons-radio" style="padding-bottom:5px;">
         <button id="navigate" class="btn btn-inverse btn-map-ctrl">
           <i class="icon icon-white icon-move"></i> Navigate
@@ -110,45 +87,50 @@
         <button id="polygon"  class="btn btn-inverse btn-map-ctrl ">
           <i class="icon icon-white icon-map-marker"></i> Polygon
         </button>
+<!--
+        <button id="polygon"  class="btn btn-inverse" onClick="toggleControl('path');">
+          <i class="icon icon-white icon-pencil"></i> Line
+        </button>
+        <button id="point"    class="btn btn-inverse btn-map-ctrl ">
+          <i class="icon icon-white icon-flag"></i> Point
+        </button>
+-->
+
         <button id="modify"    class="btn btn-inverse btn-map-ctrl ">
           <i class="icon icon-white icon-edit"></i> Edit 
         </button>        
+<!--
         <button id="delete"    class="btn btn-inverse btn-map-ctrl ">
           <i class="icon icon-white icon-trash"></i> Delete
         </button>
+-->
         <button id="skip" class="btn btn-inverse" value="1">Skip Image</button>
       </div>
-
-
       <div id="question">
       	  <p></p>
-      	  <div id="output"><ul id="list" style="list-style: none;"></ul></div>
       	  <hr>
           <h1></h1>
           <h3></h3>
       </div>
-  
-<!--
+      
       <div id="multiple" class="btn-group" data-toggle="buttons-radio" style="padding-bottom: 5px;">
       	  <h2>Is there more than one landfill on the map?</h2>
 	      <button id="single" class="btn btn-inverse btn-multiple" value="0">No</button>
    	      <button id="multiple" class="btn btn-inverse btn-multiple" value="1">Yes</button>
       </div>
--->
 
-<!--
       <div id="certain" class="btn-group" data-toggle="buttons-radio" style="padding-bottom: 5px;">
       	  <h2>How confident are you?</h2>
-
+	      <button id="not" class="btn btn-inverse btn-certain" value="0">Not Certain</button>
+   	      <button id="very" class="btn btn-inverse btn-certain" value="1">Very Certain</button>
       </div>
--->
       
-      <!-- <button id="answerbtn" class="btn btn-success btn-submit" value="coordinates" style="display:none"><i class="icon-check icon-white"></i> Save this data</button> -->
+      <button id="answerbtn" class="btn btn-success btn-submit" value="coordinates" style="display:none"><i class="icon-check icon-white"></i> Save this data</button>
       
           <p><!-- You are working on task: <span id="task-id" class="label label-warning"></span> -->
           <a href="../tutorial" class="btn btn-primary pull-right" style="margin-left:-15px;">Tutorial</a>
           </p>
-<!--           <hr> -->
+          <hr>
           <h4>Your progress</h4>
           
           <div class="progress progress-striped">
@@ -184,7 +166,6 @@
 <script>
 var step = 0;
 var steps = 2;
-var map, vectors, controls;
 
 function updateBar(fact) {
     if (step < steps) {
@@ -209,7 +190,6 @@ function enableBtn() {
     
         $("#answerbtn").removeClass('disabled');
         $("#answerbtn").show();
-        $(".btn-certain").show();        
         //$("#answerbtn").click(submitTask);
     }
 }
@@ -217,7 +197,6 @@ function enableBtn() {
 // Function to enable/disable the drawing controls. Only one can be active at a time
 function toggleControl(task, control) {
     for (key in task.drawControls) {
-	    console.log(control);
         var ctrl = task.drawControls[key];
         if ( (control == key) && (!ctrl.active) ) {
             ctrl.activate();
@@ -236,6 +215,7 @@ function center(task) {
             task.map.getProjectionObject() // to Spherical Mercator Projection
         );
     // Center the map
+    task.areaLayer.removeAllFeatures();
     $("#answerbtn").addClass("disabled");
     task.map.setCenter(lonLat, 14);
 }
@@ -253,78 +233,61 @@ function loadUserProgress() {
 }
 
 /* This function is taken from the openlayers example http://openlayers.org/dev/examples/modify-feature.html */        
-function update(task) {
+function update() {
     // reset modification mode
-    console.log("updated function");
-    task.drawControls.modify.mode = OpenLayers.Control.ModifyFeature.RESHAPE;
-    task.drawControls.modify.createVertices = true;
-   
-}
+    controls.modify.mode = OpenLayers.Control.ModifyFeature.RESHAPE;
+    controls.modify.createVertices = document.getElementById("createVertices").checked;
 
+}
 
 // This function is used to setup variables for questions being asked
 pybossa.taskLoaded(function(task, deferred){
     if ( !$.isEmptyObject(task) ) {
-
+    	
 		task.answer = {
 			'task_id': task.id,
 			'Facility_Name': task.info.Facility_Name,
 			'Facility_State': task.info.Facility_State,
 			'Facility_Street': task.info.Facility_Street,
 			'Days_Since_Last_Inspection': task.info.Days_Since_Last_Inspection,
-			'area': [], // this is an area which has the total area, the geometry and the id of the feature
+/* 		    'area': 0, */
+			'area': [],
 		    'X_id': task.info.X_id,
-		    //'geometry': [],
+		    'geometry': [],
 		    'skip': 0,
 		    'multiple': 0,
 		    'certain': -1 
 	    }		
-	    console.log("*** Initialization of Answer ***");
-	    console.log(task.answer);
-	    
-	    // Bing APi key
+
         var apiKey = "As1jW63G51I3Z3jFZmmsNHsJ8CVxNtkyd7VCtzXk-E0Bztzd80fR0axNXApJW3O5";
   		
-  		// Build html for the map
-        var map_div = $("<div/>", {id:"map_task_" + task.id, 'class': 'span4'}); // create div with id=task.id and class=span4
-        var map_canvas = $("<div/>", {id: "map_" + task.id, 'class': 'map_canvas'}); // create div with id=map_task.id and class=map_canvas
-        map_canvas.css("width", "980px"); 
+        var map_div = $("<div/>", {id:"map_task_" + task.id, 'class': 'span4'});
+        var map_canvas = $("<div/>", {id: "map_" + task.id, 'class': 'map_canvas'});
+        map_canvas.css("width", "980px");
         map_canvas.css("height", "510px");
-        map_div.append(map_canvas); //add the map canvas to the map div
+        map_div.append(map_canvas);
         
         $("#maps").prepend(map_div);
         
         updateBar("Loading task data...");
         
-        //Create the map
         task.map = new OpenLayers.Map("map_" + task.id, {
             controls: [
                 new OpenLayers.Control.Navigation(),
                 new OpenLayers.Control.PanZoomBar(),
-                //new OpenLayers.Control.LayerSwitcher({roundedCornerColor: 'black'}),
-                new OpenLayers.Control.Attribution(),
+                new OpenLayers.Control.LayerSwitcher({roundedCornerColor: 'black'}),
+                new OpenLayers.Control.Attribution()
             ],
             projection: new OpenLayers.Projection("EPSG:900913"),
             displayProjection: new OpenLayers.Projection("EPSG:4326"),
             units: "m",
             //maxExtent: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508.34)
         });
-        
-        // Add bing layer
+
         task.map.addLayer(new OpenLayers.Layer.Bing({
             key: apiKey,
             type: "Aerial"
         }));
-		var scaleline = new OpenLayers.Control.ScaleLine();
-		task.map.addControl(scaleline);        
-
-        // Google Maps Satellite layer
-/*
-        task.map.addLayer(new OpenLayers.Layer.Google(
-            "Google Satellite",
-            {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 16}
-        ));
-*/
 
         // take whatever is coming in and convert it to lat/lon and map to the earth
         var lonLat = new OpenLayers.LonLat(parseFloat(task.info.LRT_Lon), parseFloat(task.info.LRT_Lat))
@@ -341,134 +304,69 @@ pybossa.taskLoaded(function(task, deferred){
 		markers.addMarker(new OpenLayers.Marker(lonLat,icon));
 		task.map.addLayer(markers);
 
+        // Google Maps Physical layer
+        task.map.addLayer(new OpenLayers.Layer.Google(
+            "Google Physical",
+            {type: google.maps.MapTypeId.TERRAIN, numZoomLevels: 24}
+        ));
+
+        // Red color for the path and polygon control to integrate with red controls
+        // and inverse Bootstrap color scheme
+        var styleBlack = new OpenLayers.StyleMap({
+            pointRadius: 3,
+            fillColor: "rgba(255,0,0,0.5)",
+            strokeColor: "rgba(255,0,0,0.5)",
+            strokeWidth: 1,
+        });
+
         task.areaLayer = new OpenLayers.Layer.Vector("Area Layer", {
-            //styleMap: styleBlack,
+            styleMap: styleBlack,
         });
 
         //adding the event triggers to the areaLayer
         task.areaLayer.events.on({
+/*
             featureselected: function(e) {
-            	//features can be selected with the modify or delete mode.  if it's not modify, are you sure you want to delete?
                 if (!task.drawControls['modify'].active) {
                     var remove = confirm("Are you sure you want to REMOVE this element?");
                     if (remove == true) {
                         var id = e.feature.id;
                         var feature = task.areaLayer.getFeatureById(id);
                         task.areaLayer.removeFeatures(feature);
-                        
-                        $(document.getElementById(id)).empty(); // clear the html
-                        
-                        // Loop through features and delete the selected one
-						for (var i=0; i<task.answer.area.length; i++){
-							if(task.answer.area[i].id == id) {                        
-								console.log("*** Deleting ***");
-								console.log(task.answer.area[i]);
-
-								task.answer.area.splice(i, 1); // delete at selected area
-							}
-						}
-						
-						console.log("*** Remaining Features ***");
-						console.log(task.answer.area);
+                        task.answer.area = 0;
                     }
                 } 
             },
+*/
             featureadded: function(e) {
-            	console.log("*** Added a new feature ***");
-            	
 			    var id = e.feature.id;
 			    var feature = task.areaLayer.getFeatureById(id);
 	            var geometry = feature.geometry; 
 
 	            // calculate the area as if it was projected on the earth
 				var geoDesic = feature.geometry.getGeodesicArea(task.map.getProjectionObject()); 
-
-		        // format the geometry into JSON
-//			    var geojson_format = new OpenLayers.Format.GeoJSON();
-//			    geometry = geojson_format.write(geometry)
-
-//			    geometry = geometry.transform(
-//			            task.map.getProjectionObject(),
-//			            new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
-//		        );
-			    //task.answer.geometry.push(geojson_format.write(geometry)); //using push so i can capture multiple shapes in one array
-			    //task.answer.geometry = geojson_format.write(geometry);
-
-				var format = new OpenLayers.Format.GeoJSON({
-				  'internalProjection': new OpenLayers.Projection("EPSG:900913"),
-				  'externalProjection': new OpenLayers.Projection("EPSG:4326")
-				});
-				var jsonstring = format.write(feature.geometry);
-
-				var featureArea = {
-					'id' : id,
-					'area' : geoDesic,
-					'area_geometry' : jsonstring
-				}
-											
-				task.answer.area.push(featureArea); // add to answer
-				
-				for (var key in task.answer.area){
-				    //console.log("First Answer: " + task.answer.area[key].area_geometry);
-				}
-				//task.answer.area.push(geoDesic); //using .push(geoDesic) adds the element to an array
-			    //task.answer.area = geoDesic;
+				task.answer.area.push(geoDesic); //using .push(geoDesic) adds the element to an array
+/* 			    task.answer.area = geoDesic; */
 			    
-			    // Create html to display on screen
+			    // Show the area results on screen
 			    var out = "";
-		        out += "<strong>Area:</strong> " + geoDesic.toFixed(3) + "m<br>This landfill is the equivalent to " + Math.round(geoDesic.toFixed(3)/6400) + " football fields.";     			    
-		        console.log(out);
-		        // Add new html to see the area on the page
-                var element = document.getElementById('list'); // get the <ul> with id=list		        
-		        $("<li/>", {id: id}).appendTo(element); // create a new <li> with id of the feature name
-		        $(document.getElementById(id)).append(out); // add new element to the <ul> with id=list		        
+                var element = document.getElementById('output');
+		        out += "<br><strong>Area:</strong> " + geoDesic.toFixed(3) + "m<br>This landfill is the equivalent to " + Math.round(geoDesic.toFixed(3)/6400) + " football fields.";     			    
+			    $("#question p").append(out);
+			    			    
+			    // transform the geometry into lat/lon coordinates
+			    var geoNormalBack = feature.geometry.transform(
+			            task.map.getProjectionObject(),
+			            new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
+		        );
+		        
+		        // format the geometry into JSON
+			    var geojson_format = new OpenLayers.Format.GeoJSON();
+			    task.answer.geometry.push(geojson_format.write(geometry)); //using push so i can capture multiple shapes in one array
+/* 			    task.answer.geometry = geojson_format.write(geometry); */
 
-            },
-            featuremodified: function(e) {
-            	console.log("*** Feature modified ***");
-            	var id = e.feature.id;
-	            
-		        for (var i=0; i<task.answer.area.length; i++){
-			        if(task.answer.area[i].id == id) {
-				        console.log("Updateing the Area and Geometry of Area : "+task.answer.area[i].id);
-
-			            //console.log("feature id : " + id);            	
-			            var feature = task.areaLayer.getFeatureById(id);
-
-           	            // calculate the area as if it was projected on the earth
-						var geoDesic = feature.geometry.getGeodesicArea(task.map.getProjectionObject()); 
-		
-				        // format the geometry into JSON
-			            var geometry = feature.geometry;
-//					    var geojson_format = new OpenLayers.Format.GeoJSON();	
-//					    var geojson_data = geojson_format.write(geometry); 			        
-
-						var format = new OpenLayers.Format.GeoJSON({
-						  'internalProjection': new OpenLayers.Projection("EPSG:900913"),
-						  'externalProjection': new OpenLayers.Projection("EPSG:4326")
-						});
-						var jsonstring = format.write(feature.geometry);					    
-
-					    task.answer.area[i].area = geoDesic; // add the area to the answer
-					    task.answer.area[i].area_geometry = jsonstring; // add the lat/lon coordinates of the geometry to the answer
-					    
-					    for (var key in task.answer.area[i]){
-						    console.log("New Answer: " + task.answer.area[i][key]);
-						}
-
-						// clear current information
-						$(document.getElementById(id)).empty();
-
-					    var out = "";
-					    var num = i + 1;
-				        out += "<strong>Area Landfill "+num+": </strong> " + geoDesic.toFixed(3) + "m<br>This landfill is the equivalent to " + Math.round(geoDesic.toFixed(3)/6400) + " football fields.";     	
-				        // add new html to the <li> with id=id
-					    $(document.getElementById(id)).append(out);				
-			        }
-		        }				
             }
         });
-        
         task.map.addLayer(task.areaLayer);
 
         // Drawing controls
@@ -477,8 +375,14 @@ pybossa.taskLoaded(function(task, deferred){
                                                            OpenLayers.Handler.Polygon, //draw a polygon on the map
                                                            {'featureAdded': enableBtn} //once the feature is added, enable the submit button
                                                           ),
+/*
+            point:      new OpenLayers.Control.DrawFeature(task.areaLayer, 
+                                                           OpenLayers.Handler.Point,
+                                                           {'featureAdded': enableBtn}
+                                                          ),
+*/
             modify:     new OpenLayers.Control.ModifyFeature(task.areaLayer),
-            delete:     new OpenLayers.Control.SelectFeature(task.areaLayer),
+//            delete:     new OpenLayers.Control.SelectFeature(task.areaLayer),
         }
 
         // Add drawControls to the map
@@ -509,10 +413,6 @@ pybossa.presentTask(function(task, deferred){
         $(".btn-map-ctrl").off('click').on('click', function(evt){
             var ctrlClicked = $(evt.target).attr("id");
             toggleControl(task, ctrlClicked);
-            if(ctrlClicked == "modify"){
-	            update(task);
-	            console.log("ran the update function call");
-            }
         });
 
         // could not find a landfill and skipping to the next image
@@ -521,14 +421,10 @@ pybossa.presentTask(function(task, deferred){
             if (remove == true) {
 		        task.answer.skip = $(evt.target).attr("value");
                 task.answer.area = 0;
-/*
 		        for (var key in task.answer) {
 		            console.log(key + " : " + task.answer[key]);
 		        }
-*/
 	            pybossa.saveTask(task.id, task.answer).done( function(data) {	            
-	                console.log("*** THIS IS THE SKIPPED SAVED ANSWER ***");
-	                console.log(task.answer);
 	                // Show the feedback div
 	                $("#success").fadeIn(); 
 	                // Fade out the pop-up after a 1000 miliseconds
@@ -536,10 +432,8 @@ pybossa.presentTask(function(task, deferred){
 	                $("#map_" + task.id).remove();
 	                deferred.resolve();
 	            });	        
-            } else {
-            	console.log("cancelled the skip");
-	            $("#skip").removeClass("active"); // this doesnt seem to be working        
-            }
+            } 
+            $("#skip").removeClass("active"); // this doesnt seem to be working        
         });        
         
         // how certain are you answer
@@ -555,17 +449,12 @@ pybossa.presentTask(function(task, deferred){
         // submit the answer
         $(".btn-submit").off('click').on('click', function(evt){			
 			// clear the element 
-		    $(document.getElementById('list')).empty();
+		    $(document.getElementById('output')).empty();
 
             pybossa.saveTask(task.id, task.answer).done( function(data) {	            
-            	console.log("*** THIS IS THE SAVED ANSWER ***");
-                console.log(task.answer);
-/*
                 for (var key in task.answer) {
-                	console.log("*** THIS IS THE SAVED ANSWER ***");
 	                console.log(key + " : " + task.answer[key]);
                 }
-*/
                 $("#success").fadeIn(); 
                 // Fade out the pop-up after a 1000 miliseconds
                 setTimeout(function() { $("#success").fadeOut() }, 1000);
@@ -582,7 +471,6 @@ pybossa.presentTask(function(task, deferred){
         $("#modify").removeClass("active");
         $("#delete").removeClass("active");
         $("#answerbtn").hide();
-        $(".btn-certain").hide();
         $("#map_task_" + task.id).show();
     }
     else {

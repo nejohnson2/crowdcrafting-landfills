@@ -1,7 +1,7 @@
 {
-    "name": "Landfill Research",
+    "name": "Landfill Hunting",
     "short_name": "landfill",
     "thumbnail": "http://www.opentrashlab.com/img/landfill-pic.png",
     "description": "Landfill image analysis",
-    "question": "Analyze this landfill"
+    "question": "Do you see a landfill in this image?"
 }

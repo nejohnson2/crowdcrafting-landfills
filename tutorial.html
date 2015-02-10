@@ -2,26 +2,38 @@
     <div class="span12">
         <div id="modal" class="modal hide fade">
             <div class="modal-header">
-                <h3>Landfill tutorial</h3>
+                <h3>Landfill Hunting Tutorial</h3>
             </div>
             <div id="0" class="modal-body" style="display:none">
-                <p><strong>Hi!</strong> This is a <strong>research application</strong> that helps gather more information about landfills across the United States.  Currently, there are <strong>1235</strong> landfill across the country. Through this application, we want to identify the total square footage of all landfills in the country as well as gather more information about the areas surrounding landfills.  
+                <p><strong>Hi!</strong> This is a <strong>research application</strong> that helps gather more information about landfills across the United States.  Currently, there are <strong>1235</strong> landfills in the country. Through this application, we are trying to identify the total square footage of all landfills in the country as well as gather more information about the areas surrounding landfills.  
                </p> 
-               <p>This is a research project being conducted through <strong>Open Trash Lab</strong>, an organization that strives to improve our waste practices across the country by better understanding the current waste system.  Identifying landfills and understanding them better is a step towards connecting people with their waste and understanding the life of their trash.</p>
+               <p>To begin, you will be given an image taken from Bing maps.  This location is taken from the Environmental Protection Agency database which has records about all of the landfills in the country.  However, this database doesn't have information about the <strong>size of the landfills</strong> and often the location of the landfill is not exactly where the coordinates specify.</p>
+                <p><strong>We need your help to find all of the landfills!!!</strong></p>
             </div>
+            
             <div id="1" class="modal-body" style="display:none">
-                <p>To begin, you will be presented the latitude and longitude of a landfill collected from the Environmental Protection Agency.</p>
-                <p><strong>This data may contain errors!!!</strong></p>
-                <p>Often the latitude and longitude of a landfill may relate to an office or nearby building and not the landfill itself.</p>
-                <p>As this is a demo application, you can also draw polygons. Polygons could be used to measure areas in the maps.</p>
+                <p>Once an image is loaded, use the navigation tools to browse around.  <strong>Zoom in and out.</strong>  What we are looking for is a <strong>large barren landscape</strong>, often brown or green.  Landfills also often have <strong>visible layers</strong> of trash build up.  This should help you identify a landfill.  Here are some example landfill images:</p>
+                <div style="text-align: center;">
+	                <img src="https://farm4.staticflickr.com/3795/13545767633_5c85efc3d4_q.jpg" width="150" height="150" alt="Landfills" style="margin-bottom: 10px;">
+	                <img src="https://farm4.staticflickr.com/3723/13545990714_85c0f5b823_q.jpg" width="150" height="150" alt="Landfills" style="margin-bottom: 10px;">
+	                <img src="https://farm4.staticflickr.com/3717/13545680395_f4a79aef1d_q.jpg" width="150" height="150" alt="Landfills" style="margin-bottom: 10px;">
+	                <img src="https://farm3.staticflickr.com/2861/13545768193_8eb2f9b69a_q.jpg" width="150" height="150" alt="Landfills">
+	                <img src="https://farm8.staticflickr.com/7201/13545990584_4f825823ea_q.jpg" width="150" height="150" alt="Landfills">
+	                <img src="https://farm3.staticflickr.com/2814/13545990694_4d460c172c_q.jpg" width="150" height="150" alt="Landfills">
+                </div>
             </div>
             <div id="2" class="modal-body" style="display:none">
-                <p>Test on modal three</p>
+                <p>If you think you've found a landfill, use the <strong>Polygon</strong> tool and click to make points outlining the landfill.  Double click to finish.  Once the outline is completed, you will see the total area in square meters as well as in football fields (sometimes it's easier to realize how big landfills are by counting the size in football fields!!!). Use the <strong>Edit</strong> button to change any of the points and use the <strong>Delete</strong> to remove any misplaced polygons.  You may draw more than one outline if you see more than one landfill.</p>
+                <div style="text-align: center;">
+	                <img src="https://farm8.staticflickr.com/7248/13546083543_8907fcc692_m.jpg" width="240" height="182" alt="Screen Shot 2014-03-31 at 4.37.12 PM" style="margin-bottom: 10px;">
+                </div>
+                <p>To finish, go ahead and press the <strong>'Save This Data'</strong> button.  If you aren't able to find a landfill, go ahead and press <strong>'Skip Image'</strong> to move onto the next image.</p>
+                <p>We've also given you a button to identify how sure you are about the landfill.  Landfill hunting is tough business! You may not always find one right away!</p>                
             </div>            
             <div class="modal-footer">
                 <a id="prevBtn" href="#" onclick="showStep('prev')" class="btn">Previous</a>
                 <a id="nextBtn" href="#" onclick="showStep('next')" class="btn btn-success">Next</a>
-                <a id="startContrib" href="../landfill/newtask" class="btn btn-primary" style="display:none"><i class="icon-thumbs-up"></i> Try the demo!</a>
+                <a id="startContrib" href="../landfill/newtask" class="btn btn-primary" style="display:none"><i class="icon-thumbs-up"></i> Start Contributing!</a>
             </div>
         </div>
     </div>
